@@ -37,13 +37,15 @@
           x: e.clientX - rect.left,
           y: e.clientY - rect.top,
         };
-        if (
-          point.y < 155 &&
-          point.y > 105 &&
-          point.x > x / 2 - button1.width / 2 &&
-          point.x < x / 2 + button1.width / 2
-        ) {
-          if (!clicked) {
+
+        if (!clicked) {
+          if (
+            //「あみだくじ！」をクリックしたら
+            point.y < 155 &&
+            point.y > 105 &&
+            point.x > x / 2 - button1.width / 2 &&
+            point.x < x / 2 + button1.width / 2
+          ) {
             wordList = shuffle(wordList);
             wordList.splice(Math.floor(Math.random() * 5), 0, "みたち");
 
@@ -63,12 +65,13 @@
             if (numList.length == 1) {
             }
             lineList.push([checked]); //-1で取り出せるように
+            //自分の動くべき道追加
             for (let i = 0; i < numList.length - 1; i++) {
               lineList.push([[numList[i], numList[i + 1]], numList[i + 1]]);
             }
-            //自分動かすダミー追加
+            //自分動かすダミー道追加
             let last = [checked];
-            while (lineList.length < 7) {
+            while (lineList.length < 8) {
               let rand = Math.floor(Math.random() * lineList.length);
               let before = lineList[rand][lineList[rand].length - 1];
               let middleWay = Math.random() > 0.5 ? 1 : -1;
@@ -84,16 +87,21 @@
               last = [before, middle];
               lineList.splice(rand + 1, 0, [[before, middle], middle]);
               lineList.splice(rand + 2, 0, [[middle, before], before]);
+              if (middle != 0 && middle != 4) {
+                let middle2 = middle + (middle - before);
+                lineList.splice(rand + 2, 0, [[middle, middle2], middle2]);
+                lineList.splice(rand + 3, 0, [[middle2, middle], middle]);
+              }
             }
             clicked = true;
-            //自分動かさないダミー追加
+            //自分動かさないダミー道追加
             lineList2.push([checked]); //-1で取り出せるように
             for (line of lineList) {
               if (line.length != 1) {
                 let minNum = Math.min(...line[0]);
                 let before, middle;
                 if (minNum == 0) {
-                  if (Math.random() > 0.6) {
+                  if (Math.random() > 0.7) {
                     before = 2;
                     middle = 3;
                   } else {
@@ -110,7 +118,7 @@
                   middle = 1;
                 }
                 if (minNum == 3) {
-                  if (Math.random() > 0.6) {
+                  if (Math.random() > 0.7) {
                     before = 0;
                     middle = 1;
                   } else {
@@ -123,10 +131,9 @@
               }
             }
           }
-        }
-        if (!clicked) {
           for (let i = 0; i < 5; i++) {
             if (
+              //ボタンがクリックされたら
               point.y < 230 &&
               point.y > 170 &&
               point.x < (x / 6) * (1 + i) + 20 &&
