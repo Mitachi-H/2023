@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .canvas-parent {
+        width: 100%;
+        height: 200vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h2>今年大事にするべきものあみだ</h2>
+      <div style="text-align: center">
+        スタート地点を選択したら<br />「あみだくじ！」をクリック！！
+      </div>
+    </div>
+    <div class="canvas-parent" id="canvasParent">
+      <canvas id="canvas"></canvas>
+    </div>
+    <script>
+      const FRAMERATE = 60;
+      let canvasParent = document.getElementById("canvasParent");
+      let canvas = document.getElementById("canvas");
+      let context = canvas.getContext("2d");
+
+      let x = canvas.width;
+      let y = canvas.height;
+
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const point = {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+        };
+        if (
+          point.y < 155 &&
+          point.y > 105 &&
+          point.x > x / 2 - button1.width / 2 &&
+          point.x < x / 2 + button1.width / 2
+        ) {
+          if (!clicked) {
+            wordList = shuffle(wordList);
+            wordList.splice(Math.floor(Math.random() * 5), 0, "みたち");
+
+            let index = wordList.indexOf("みたち");
+            let numList = [];
+
+            for (
+              let i = Math.min(index, checked);
+              i < Math.max(index, checked) + 1;
+              i++
+            ) {
+              numList.push(i);
+            }
+            if (index < checked) {
+              numList.reverse();
+            }
+            if (numList.length == 1) {
+            }
+            lineList.push([checked]); //-1で取り出せるように
+            for (let i = 0; i < numList.length - 1; i++) {
+              lineList.push([[numList[i], numList[i + 1]], numList[i + 1]]);
+            }
+            //自分動かすダミー追加
+            let last = [checked];
+            while (lineList.length < 7) {
+              let rand = Math.floor(Math.random() * lineList.length);
+              let before = lineList[rand][lineList[rand].length - 1];
+              let middleWay = Math.random() > 0.5 ? 1 : -1;
+              let middle = before + middleWay;
+              if (last.includes(middle)) {
+                middle = middle - 2 * middleWay;
+              }
+              if (middle == -1) {
+                middle = 1;
+              } else if (middle == 5) {
+                middle = 3;
+              }
+              last = [before, middle];
+              lineList.splice(rand + 1, 0, [[before, middle], middle]);
+              lineList.splice(rand + 2, 0, [[middle, before], before]);
+            }
+            clicked = true;
+            //自分動かさないダミー追加
+            lineList2.push([checked]); //-1で取り出せるように
+            for (line of lineList) {
+              if (line.length != 1) {
+                let minNum = Math.min(...line[0]);
+                let before, middle;
+                if (minNum == 0) {
+                  if (Math.random() > 0.6) {
+                    before = 2;
+                    middle = 3;
+                  } else {
+                    before = 3;
+                    middle = 4;
+                  }
+                }
+                if (minNum == 1) {
+                  before = 3;
+                  middle = 4;
+                }
+                if (minNum == 2) {
+                  before = 0;
+                  middle = 1;
+                }
+                if (minNum == 3) {
+                  if (Math.random() > 0.6) {
+                    before = 0;
+                    middle = 1;
+                  } else {
+                    before = 1;
+                    middle = 2;
+                  }
+                }
+
+                lineList2.push([before, middle]);
+              }
+            }
+          }
+        }
+        if (!clicked) {
+          for (let i = 0; i < 5; i++) {
+            if (
+              point.y < 230 &&
+              point.y > 170 &&
+              point.x < (x / 6) * (1 + i) + 20 &&
+              point.x > (x / 6) * (1 + i) - 20
+            ) {
+              checked = i;
+            }
+          }
+        }
+      });
+
+      let resize = () => {
+        canvas.width = canvasParent.clientWidth;
+        canvas.height = canvasParent.clientHeight;
+        x = canvas.width;
+        y = canvas.height;
+      };
+
+      let clicked = false;
+      let checked = 0;
+      let wordList = [
+        "お金",
+        "家族",
+        "就活",
+        "サークル",
+        "食事",
+        "努力",
+        "友達",
+        "恋人",
+      ];
+      let lineList = [];
+      let lineList2 = [];
+      const shuffle = ([...array]) => {
+        for (let i = array.length - 1; i >= 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      };
+
+      let draw = () => {
+        if (clicked) {
+          context.beginPath();
+          context.font = "15pt Arial";
+          context.textAlign = "center";
+          context.fillStyle = "rgba(255, 0, 0, 1)";
+          context.fillText("あけましておめでとうございます", x / 2, 700);
+          context.stroke();
+          context.beginPath();
+          context.font = "15pt Arial";
+          context.textAlign = "center";
+          context.fillStyle = "rgba(255, 0, 0, 1)";
+          context.fillText("今年もよろしくお願いします", x / 2, 720);
+          context.stroke();
+          for (let i = 0; i < 5; i++) {
+            context.beginPath();
+            context.lineWidth = 4;
+            context.moveTo((x / 6) * (1 + i), 210);
+            context.lineTo((x / 6) * (1 + i), 600);
+            context.stroke();
+          }
+          for (let i = 0; i < 5; i++) {
+            context.beginPath();
+            context.font = "10pt Arial";
+            context.textAlign = "center";
+            context.fillStyle = "rgba(0, 0, 0, 1)";
+            context.fillText(wordList[i], (x / 6) * (1 + i), 630);
+            context.stroke();
+          }
+          const l = lineList.length;
+          let i = 0;
+          for (line of lineList) {
+            if (line.length != 1) {
+              context.beginPath();
+              context.lineWidth = 4;
+              context.moveTo((x / 6) * (1 + line[0][0]), 250 + (i * 300) / l);
+              context.lineTo((x / 6) * (1 + line[0][1]), 250 + (i * 300) / l);
+              context.stroke();
+              i++;
+            }
+          }
+          i = -1;
+          for (line of lineList2) {
+            if (lineList2.length != 1) {
+              context.beginPath();
+              context.lineWidth = 4;
+              context.moveTo((x / 6) * (1 + line[0]), 250 + (i * 300) / l);
+              context.lineTo((x / 6) * (1 + line[1]), 250 + (i * 300) / l);
+              context.stroke();
+              i++;
+            }
+          }
+        }
+        for (let i = 0; i < 5; i++) {
+          context.beginPath();
+          context.arc((x / 6) * (1 + i), 200, 10, 0, Math.PI * 2, true);
+          context.strokeStyle = "black";
+          context.lineWidth = 2;
+          context.stroke();
+        }
+        context.beginPath();
+        context.arc((x / 6) * (1 + checked), 200, 10, 0, Math.PI * 2, true);
+        context.fillStyle = "rgba(255,0,0,0.8)";
+        context.fill();
+        context.stroke();
+      };
+      let button1;
+
+      let drawButton = () => {
+        context.beginPath();
+        context.font = "40pt Arial";
+        context.textAlign = "center";
+        var button = context.measureText("あみだくじ！");
+        button1 = button;
+        context.fillStyle = "rgba(255, 0, 0, 0.25)";
+        context.fillRect(x / 2 - button.width / 2, 155, button.width, -50);
+
+        context.fillStyle = "rgba(255, 0, 0, 1)";
+        context.fillText("あみだくじ！", x / 2, 150);
+        context.stroke();
+      };
+
+      let world = () => {
+        resize();
+        draw();
+        drawButton();
+      };
+
+      setInterval(() => world(), 1000 / FRAMERATE);
+    </script>
+  </body>
+</html>
